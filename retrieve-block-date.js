@@ -1,11 +1,11 @@
 const fetch = require('node-fetch');
 
 /**
- * Retrieves the date of a blockchain block by its height
- * @param {number} blockHeight - The height of the block to get the date for
+ * Retrieves the date of a blockchain block by its height or hash
+ * @param {number|string} blockIdentifier - The height of the block or the block hash
  * @returns {Promise<string|null>} The date string of the block or null if an error occurs
  */
-async function retrieveBlockDate(blockHeight) {
+async function retrieveBlockDate(blockIdentifier) {
 	const rpcUrl = 'http://localhost:18443';
 	const rpcUser = 'leeloo';
 	const rpcPassword = 'multipass';
@@ -54,16 +54,19 @@ async function retrieveBlockDate(blockHeight) {
 	}
 
 	try {
-		const blockHash = await rpcCall('getblockhash', [blockHeight]);
+		let blockHash;
+		// If blockIdentifier is a number, treat it as a block height
+		if (typeof blockIdentifier === 'number') {
+			blockHash = await rpcCall('getblockhash', [blockIdentifier]);
+		} else {
+			// Otherwise, treat it as a block hash
+			blockHash = blockIdentifier;
+		}
+
 		const blockInfo = await rpcCall('getblock', [blockHash]);
-
-		const timestampInSeconds = blockInfo.time;
-		const date = new Date(timestampInSeconds * 1000);
-
-		// Format and return the date string
-		return date.toString();
+		return blockInfo.time; // Return the timestamp directly
 	} catch (error) {
-		console.error(`Could not retrieve block date for height ${blockHeight}:`, error.message);
+		console.error(`Could not retrieve block date for ${blockIdentifier}:`, error.message);
 		return null;
 	}
 }
