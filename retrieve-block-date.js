@@ -1,4 +1,4 @@
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
 /**
  * Retrieves the date of a blockchain block by its height
@@ -19,7 +19,7 @@ async function retrieveBlockDate(blockHeight) {
 	async function rpcCall(method, params = []) {
 		const auth = Buffer.from(`${rpcUser}:${rpcPassword}`).toString('base64');
 		const headers = {
-			'Content-Type': 'application/json',
+			'content-type': 'text/plain;',
 			'Authorization': `Basic ${auth}`,
 		};
 
@@ -30,27 +30,27 @@ async function retrieveBlockDate(blockHeight) {
 			params,
 		});
 
-		return fetch(rpcUrl, {
-			method: 'POST',
-			headers: headers,
-			body: body,
-		})
-			.then(response => {
-				if (!response.ok) {
-					throw new Error(`HTTP error! status: ${response.status}`);
-				}
-				return response.json();
-			})
-			.then(data => {
-				if (data.error) {
-					throw new Error(`RPC error: ${data.error.message}`);
-				}
-				return data.result;
-			})
-			.catch(error => {
-				console.error('Error during RPC call:', error);
-				throw error;
+		try {
+			const response = await fetch(rpcUrl, {
+				method: 'POST',
+				headers: headers,
+				body: body,
 			});
+
+			if (!response.ok) {
+				const errorText = await response.text();
+				throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
+			}
+
+			const data = await response.json();
+			if (data.error) {
+				throw new Error(`RPC error: ${data.error.message}`);
+			}
+			return data.result;
+		} catch (error) {
+			console.error('Error during RPC call:', error);
+			throw error;
+		}
 	}
 
 	try {
@@ -68,4 +68,4 @@ async function retrieveBlockDate(blockHeight) {
 	}
 }
 
-module.exports = { retrieveBlockDate };
+export { retrieveBlockDate };
