@@ -6,12 +6,6 @@ const fetch = require('node-fetch');
  * @returns {Promise<string|null>} The date string of the block or null if an error occurs
  */
 async function retrieveBlockDate(blockHeight) {
-	// Input validation
-	if (typeof blockHeight !== 'number' || blockHeight < 0 || !Number.isInteger(blockHeight)) {
-		console.error('Invalid block height:', blockHeight);
-		return null;
-	}
-
 	const rpcUrl = 'http://localhost:18443';
 	const rpcUser = 'leeloo';
 	const rpcPassword = 'multipass';
