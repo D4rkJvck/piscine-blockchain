@@ -1,4 +1,4 @@
-import fetch from 'node-fetch';
+const fetch = require('node-fetch');
 
 /**
  * Retrieves the date of a blockchain block by its height
@@ -68,4 +68,4 @@ async function retrieveBlockDate(blockHeight) {
 	}
 }
 
-export { retrieveBlockDate };
+module.exports = { retrieveBlockDate }; 
